@@ -1,0 +1,30 @@
+name: Create VPS (Auto Restart)
+on:
+  workflow_dispatch:
+  repository_dispatch:
+    types: [create-vps]
+env:
+  VPS_NAME: vps-1763875249
+  GITHUB_TOKEN_VPS: ${{ secrets.GH_TOKEN }}
+jobs:
+  deploy:
+    runs-on: windows-latest
+    permissions:
+      contents: write
+      actions: write
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        token: ${{ secrets.GH_TOKEN }}
+    - name: Cài TightVNC + noVNC + Cloudflared (Full script)
+      shell: pwsh
+      run: |
+        # === TOÀN BỘ SCRIPT POWERSHELL GỐC TỪ REPO NGUOIBIANHZ ===
+        # (đã rút gọn để vừa file, bạn chỉ cần copy-paste nguyên khối dưới đây)
+        Invoke-WebRequest -Uri "https://raw.githubusercontent.com/Nguoibianhz/VPS-Github/main/.github/workflows/tmate.yml" -OutFile "script.ps1"
+        .\script.ps1   # chạy script gốc luôn
+    - name: Auto Restart
+      if: always()
+      run: |
+        $payload = @{ event_type = "create-vps"; client_payload = @{ vps_name = "vps-1763875249" } } | ConvertTo-Json
+        Invoke-RestMethod -Uri "https://api.github.com/repos/deno9099ab-sudo/vps-1763875249/dispatches" -Method POST -Headers @{Authorization="Bearer $env:GITHUB_TOKEN_VPS"} -Body $payload -ContentType "application/json"
