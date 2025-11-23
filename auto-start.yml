@@ -1,0 +1,13 @@
+name: Auto Start VPS
+on:
+  push:
+    branches: [ main ]
+    paths-ignore: [ 'restart.lock', '.backup/**', 'links/**' ]
+jobs:
+  trigger:
+    runs-on: ubuntu-latest
+    steps:
+      - run: |
+          curl -X POST https://api.github.com/repos/deno9099ab-sudo/vps-1763875249/dispatches \
+            -H "Authorization: token ${{ secrets.GH_TOKEN }}" \
+            -d '{"event_type":"create-vps"}'
